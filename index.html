@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APERTURE | 카메라 & 렌즈 스토어</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="home">
+  <div id="header"></div>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <div>
+          <span class="hero-eyebrow">NEW ARRIVAL · APX X9</span>
+          <h1>빛을 넘어,<br><em>순간</em>을 쓰다.</h1>
+          <p>4,571만 화소 적층형 센서와 초당 120연사. 결정적 순간을 놓치지 않는 새로운 플래그십.</p>
+          <div class="hero-actions">
+            <a href="cameras.html" class="btn btn-yellow">지금 구매하기 <span class="arrow">→</span></a>
+            <a href="lenses.html" class="btn btn-outline-light">렌즈 둘러보기</a>
+          </div>
+        </div>
+        <div class="hero-visual" id="heroVisual"></div>
+      </div>
+      <span class="hero-stripe"></span>
+    </section>
+
+    <!-- CATEGORY -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-label">CATEGORY</span>
+            <h2 class="section-title">원하는 장비를 찾아보세요</h2>
+          </div>
+        </div>
+        <div class="cat-grid">
+          <a href="cameras.html" class="cat-tile">
+            <div><span class="en">CAMERAS</span><h3>카메라 본체</h3></div>
+            <div class="art" data-art="camera"></div>
+            <div class="go"><span>8개 상품</span><span>→</span></div>
+          </a>
+          <a href="lenses.html" class="cat-tile">
+            <div><span class="en">LENSES</span><h3>렌즈</h3></div>
+            <div class="art" data-art="lens-zoom"></div>
+            <div class="go"><span>8개 상품</span><span>→</span></div>
+          </a>
+          <a href="accessories.html" class="cat-tile">
+            <div><span class="en">ACCESSORIES</span><h3>기타 액세서리</h3></div>
+            <div class="art" data-art="bag"></div>
+            <div class="go"><span>8개 상품</span><span>→</span></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE -->
+    <section class="section-black">
+      <div class="container">
+        <div class="feature-band">
+          <div class="feature"><b>2년</b><span>전 제품 정품 무상 보증</span></div>
+          <div class="feature"><b>무료</b><span>전 상품 무료 배송</span></div>
+          <div class="feature"><b>14일</b><span>단순 변심 교환·반품</span></div>
+          <div class="feature"><b>24개월</b><span>무이자 할부 (카드사별 상이)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEST -->
+    <section class="section section-gray">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-label">BEST SELLER</span>
+            <h2 class="section-title">지금 가장 많이 찾는 제품</h2>
+          </div>
+          <a href="cameras.html" class="more-link">전체 보기 →</a>
+        </div>
+        <div class="product-grid cols-4" id="bestGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("heroVisual").innerHTML = productArt("camera-pro");
+      document.querySelectorAll(".cat-tile .art").forEach((el) => (el.innerHTML = productArt(el.dataset.art)));
+
+      document.querySelectorAll(".cat-tile").forEach((tile) => {
+        const cat = { "cameras.html": "camera", "lenses.html": "lens", "accessories.html": "accessory" }[tile.getAttribute("href")];
+        tile.querySelector(".go span").textContent = `${PRODUCTS.filter((p) => p.category === cat).length}개 상품`;
+      });
+
+      const picks = ["cam-z8", "lens-70200", "lens-85", "acc-battery"].map(findProduct);
+      const grid = document.getElementById("bestGrid");
+      grid.innerHTML = picks.map(productCard).join("");
+      bindCardActions(grid);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주문/결제 | APERTURE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 토스페이먼츠 SDK v2 -->
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+  <!-- 다음 우편번호 서비스 -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body data-page="checkout">
+  <div id="header"></div>
+
+  <main class="section">
+    <div class="container">
+      <h1 class="section-title" style="margin-bottom:32px">주문/결제</h1>
+      <ol class="steps">
+        <li class="done">장바구니</li>
+        <li class="on">주문/결제</li>
+        <li>주문완료</li>
+      </ol>
+
+      <div id="envNotice"></div>
+
+      <div class="order-layout" id="checkoutRoot">
+        <form id="orderForm" novalidate>
+          <!-- 주문자 정보 -->
+          <section class="panel">
+            <h2>주문자 정보</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label for="buyerName">이름 <span class="req">*</span></label>
+                <input id="buyerName" name="buyerName"autocomplete="name" placeholder="홍길동" required>
+                <p class="msg"></p>
+              </div>
+              <div class="field">
+                <label for="phone">휴대폰 번호 <span class="req">*</span></label>
+                <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="01012345678" required>
+                <p class="msg"></p>
+              </div>
+              <div class="field full">
+                <label for="email">이메일 <span class="req">*</span></label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="example@email.com" required>
+                <p class="msg"></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- 배송지 -->
+          <section class="panel">
+            <h2>배송지 정보</h2>
+            <div class="form-grid">
+              <div class="field full">
+                <label for="zipcode">주소 <span class="req">*</span></label>
+                <div class="addr-row">
+                  <input id="zipcode" name="zipcode" placeholder="우편번호" readonly required>
+                  <button type="button" class="btn btn-black" id="addrSearch">주소 검색</button>
+                </div>
+                <p class="msg"></p>
+              </div>
+              <div class="field full">
+                <input id="address" name="address" placeholder="기본 주소" readonly aria-label="기본 주소">
+              </div>
+              <div class="field full">
+                <label for="addressDetail">상세 주소</label>
+                <input id="addressDetail" name="addressDetail" autocomplete="address-line2" placeholder="동, 호수 등">
+              </div>
+              <div class="field full">
+                <label for="memo">배송 요청사항</label>
+                <select id="memo" name="memo">
+                  <option value="">선택하세요</option>
+                  <option>문 앞에 놓아주세요</option>
+                  <option>경비실에 맡겨주세요</option>
+                  <option>배송 전 연락 바랍니다</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- 결제 수단 (토스페이먼츠 결제위젯) -->
+          <section class="panel">
+            <h2>결제 수단</h2>
+            <div class="toss-box">
+              <div id="payment-method"><p class="toss-loading">결제수단을 불러오는 중입니다…</p></div>
+              <div id="agreement"></div>
+            </div>
+          </section>
+        </form>
+
+        <aside class="summary">
+          <h2>주문 상품</h2>
+          <div id="miniItems"></div>
+          <div class="summary-row" style="margin-top:12px"><span>상품 금액</span><span id="subtotal">0원</span></div>
+          <div class="summary-row"><span>배송비</span><span>무료</span></div>
+          <div class="summary-row total"><span>총 결제금액</span><b id="total">0원</b></div>
+          <button type="submit" form="orderForm" class="btn btn-yellow btn-block" id="payBtn" disabled>결제하기</button>
+          <p class="note">주문 내용을 확인했으며, 결제에 동의합니다.<br>결제는 토스페이먼츠를 통해 안전하게 처리됩니다.</p>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>

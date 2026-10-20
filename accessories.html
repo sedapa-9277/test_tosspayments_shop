@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기타 액세서리 | APERTURE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="accessory">
+  <div id="header"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <nav class="breadcrumb"><a href="index.html">홈</a><span>/</span><span>기타 액세서리</span></nav>
+        <span class="en">ACCESSORIES</span>
+        <h1>기타 액세서리</h1>
+        <p>배터리, 메모리, 삼각대, 가방까지. 촬영을 완성하는 필수 액세서리.</p>
+      </div>
+      <div class="hero-art" id="heroArt" data-art="tripod"></div>
+    </section>
+
+    <nav class="cat-tabs">
+      <div class="container">
+        <a href="cameras.html">카메라 본체</a>
+        <a href="lenses.html">렌즈</a>
+        <a href="accessories.html" class="active">기타 액세서리</a>
+      </div>
+    </nav>
+
+    <section class="shop">
+      <div class="container">
+        <aside class="filters" aria-label="상품 필터">
+          <h2>FILTER</h2>
+          <div class="filter-group">
+            <h3>분류</h3>
+            <div id="tagFilters"></div>
+          </div>
+          <div class="filter-group">
+            <h3>가격</h3>
+            <div class="price-range">
+              <input type="range" id="priceMax" min="0" aria-label="최대 가격">
+              <output id="priceOut"></output>
+            </div>
+          </div>
+          <button type="button" class="reset-btn" id="resetFilters">필터 초기화</button>
+        </aside>
+
+        <div>
+          <div class="toolbar">
+            <button type="button" class="filter-toggle">필터</button>
+            <p class="result">총 <b id="resultCount">0</b>개 상품</p>
+            <label><span class="sr-only">정렬</span>
+              <select class="sort-select" id="sort">
+                <option value="recommend">추천순</option>
+                <option value="low">낮은 가격순</option>
+                <option value="high">높은 가격순</option>
+                <option value="name">이름순</option>
+              </select>
+            </label>
+          </div>
+          <div class="product-grid" id="productGrid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>
