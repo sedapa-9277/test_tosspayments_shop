@@ -72,3 +72,11 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 ## 기타
 
 - `.mcp.json`에 토스페이먼츠 연동 가이드 MCP 서버(`@tosspayments/integration-guide-mcp`)가 설정되어 있습니다. `npx`로 실행되므로 Node.js를 설치해야 동작합니다.
+- 이 PC에는 `claude` CLI가 없어 `claude plugin ...` 명령을 쓸 수 없습니다. 플러그인은 앱의 Customize → Plugins에서 설치합니다. `claude-md-management`는 설치되어 있습니다.
+
+## Supabase 연동 계획 (`PRD.md`)
+
+- 회원가입, 로그인, 내 주문 내역(`orders.html`), 환불/취소, 리뷰와 리뷰 좋아요를 Supabase로 구현할 계획입니다. 기능과 화면은 `PRD.md`를 기준으로 합니다. 아직 구현 전이며, Supabase 프로젝트도 만들어지지 않았습니다(Claude Desktop의 Supabase 커넥터는 연결되어 있습니다).
+- 결정 사항: 구매는 로그인 회원만, 상품 데이터는 DB로 이전, 로그인은 이메일+비밀번호입니다.
+- 결제 승인(`/v1/payments/confirm`)과 환불은 Supabase Edge Function에서 처리합니다. 토스 시크릿 키와 Supabase `service_role` 키는 프론트엔드에 넣지 않고, 프론트에는 `anon` 키만 `js/config.js`에 둡니다.
+- 번들러가 없으므로 `@supabase/supabase-js`는 CDN `<script>`로 불러옵니다.
