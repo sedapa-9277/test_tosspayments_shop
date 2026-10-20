@@ -5,6 +5,9 @@
 const PENDING_KEY = "aperture_pending_order";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const user = await Auth.require(); // 구매는 로그인 회원만 가능
+  if (!user) return;
+  await productsReady;
   const isBuyNow = new URLSearchParams(location.search).get("mode") === "buynow";
   const raw = isBuyNow ? BuyNow.get() || [] : Cart.read();
   const items = raw.map((i) => ({ ...i, product: findProduct(i.id) })).filter((i) => i.product);
@@ -36,6 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("subtotal").textContent = `${won(amount)}원`;
   document.getElementById("total").textContent = `${won(amount)}원`;
   payBtn.textContent = `${won(amount)}원 결제하기`;
+
+  document.getElementById("buyerName").value = (user.user_metadata && user.user_metadata.name) || "";
+  document.getElementById("email").value = user.email || "";
 
   /* 주소 검색 (다음 우편번호) */
   document.getElementById("addrSearch").addEventListener("click", () => {
@@ -72,8 +78,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const tossPayments = TossPayments(TOSS_CONFIG.clientKey);
-  // 비회원 결제: ANONYMOUS. 회원제라면 회원별 고유 customerKey(UUID 등)를 사용하세요.
-  const widgets = tossPayments.widgets({ customerKey: TossPayments.ANONYMOUS });
+  // 회원별 고유 customerKey = Supabase 회원 UUID
+  const widgets = tossPayments.widgets({ customerKey: user.id });
 
   try {
     await widgets.setAmount({ currency: "KRW", value: amount });
@@ -96,26 +102,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!validate()) return;
 
     const form = e.target;
-    const orderId = createOrderId();
-    const first = items[0].product.name;
-    const orderName = items.length > 1 ? `${first} 외 ${items.length - 1}건` : first;
-
-    // 결제 성공 페이지에서 금액 검증·주문 표시에 사용
-    try {
-      sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-        orderId, orderName, amount, isBuyNow,
-        items: items.map(({ id, qty }) => ({ id, qty })),
-        customer: {
-          name: form.buyerName.value.trim(),
-          phone: form.phone.value.replace(/\D/g, ""),
-          email: form.email.value.trim(),
-          address: `(${form.zipcode.value}) ${form.address.value} ${form.addressDetail.value}`.trim(),
-          memo: form.memo.value,
-        },
-      }));
-    } catch (err) {}
+    const customer = {
+      name: form.buyerName.value.trim(),
+      phone: form.phone.value.replace(/\D/g, ""),
+      email: form.email.value.trim(),
+      address: `(${form.zipcode.value}) ${form.address.value} ${form.addressDetail.value}`.trim(),
+      memo: form.memo.value,
+    };
 
     payBtn.disabled = true;
+    let orderId, orderName;
+    try {
+      // 서버가 상품 가격으로 금액을 다시 계산해 주문을 만든다 (화면 금액은 신뢰하지 않음)
+      const order = await Auth.call("create-order", { items: items.map(({ id, qty }) => ({ id, qty })), customer });
+      orderId = order.orderId;
+      orderName = order.orderName;
+      await widgets.setAmount({ currency: "KRW", value: order.amount });
+    } catch (err) {
+      alert(err.message || "주문 생성 중 오류가 발생했습니다.");
+      payBtn.disabled = false;
+      return;
+    }
+
+    // 결제 결과 페이지에서 장바구니/바로구매 정리에 사용
+    try { sessionStorage.setItem(PENDING_KEY, JSON.stringify({ orderId, isBuyNow })); } catch (err) {}
+
     try {
       await widgets.requestPayment({
         orderId,
@@ -135,12 +146,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   /* ---------- 유틸 ---------- */
-  function createOrderId() {
-    // 영문, 숫자, -, _, = 로 6~64자
-    const rand = Math.random().toString(36).slice(2, 10);
-    return `APT-${Date.now()}-${rand}`;
-  }
-
   function setError(id, msg) {
     const field = document.getElementById(id).closest(".field");
     field.classList.toggle("error", !!msg);

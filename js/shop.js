@@ -2,7 +2,8 @@
    카테고리 상품 목록 페이지 (카메라 / 렌즈 / 액세서리)
    body[data-page] 값으로 카테고리를 결정
    ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await productsReady;
   const category = document.body.dataset.page;
   const all = PRODUCTS.filter((p) => p.category === category);
 

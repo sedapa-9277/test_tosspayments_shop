@@ -1,7 +1,8 @@
 /* =========================================================
    장바구니 페이지
    ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await productsReady;
   const root = document.getElementById("cartRoot");
 
   function render() {

@@ -65,7 +65,7 @@ function renderHeader() {
   <div class="util-bar">
     <div class="container">
       <span>전 상품 무료배송 · 정품 2년 보증</span>
-      <nav><a href="#">고객센터</a><a href="#">정품등록</a><a href="#">로그인</a></nav>
+      <nav id="authNav"><a href="#">고객센터</a><a href="#">정품등록</a><a href="login.html">로그인/가입</a></nav>
     </div>
   </div>
   <header class="site-header">
@@ -82,7 +82,7 @@ function renderHeader() {
       </nav>
       <div class="header-actions">
         <button class="icon-btn" aria-label="검색">${ICON.search}</button>
-        <button class="icon-btn" aria-label="마이페이지">${ICON.user}</button>
+        <a href="orders.html" class="icon-btn" aria-label="내 주문">${ICON.user}</a>
         <a href="cart.html" class="icon-btn" aria-label="장바구니">${ICON.cart}<span class="cart-count" data-count="0">0</span></a>
         <button class="icon-btn menu-toggle" aria-label="메뉴" aria-expanded="false">${ICON.menu}</button>
       </div>
@@ -311,6 +311,12 @@ function productArt(type) {
 }
 
 /* ---------- 상품 카드 ---------- */
+function ratingLine(id) {
+  const s = typeof reviewStats !== "undefined" ? reviewStats[id] : null;
+  const label = s ? `<span class="stars">★</span> ${s.avg.toFixed(1)} <span class="rv-count">리뷰 ${s.count}</span>` : "리뷰 보기";
+  return `<button type="button" class="card-rating" data-action="reviews">${label}</button>`;
+}
+
 function productCard(p) {
   return `
   <article class="card" data-id="${p.id}">
@@ -321,6 +327,7 @@ function productCard(p) {
     <div class="card-body">
       <span class="card-sub">${p.sub}</span>
       <h3 class="card-name">${p.name}</h3>
+      ${ratingLine(p.id)}
       <ul class="card-specs">${p.specs.map((s) => `<li>${s}</li>`).join("")}</ul>
       <div class="card-foot">
         <span class="price">${won(p.price)}<small>원</small></span>
@@ -343,6 +350,8 @@ function bindCardActions(root) {
     if (btn.dataset.action === "add") {
       Cart.add(id);
       toast(`<span><b>${p.name}</b> 상품을 장바구니에 담았습니다.</span><a href="cart.html">장바구니 보기 →</a>`);
+    } else if (btn.dataset.action === "reviews") {
+      if (typeof openReviews === "function") openReviews(id);
     } else if (btn.dataset.action === "buy") {
       BuyNow.set(id);
       location.href = "checkout.html?mode=buynow";
@@ -355,4 +364,21 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   renderFooter();
   updateCartBadge();
+  renderAuthNav();
 });
+
+/* 헤더 로그인 상태: 로그인 전 "로그인/가입", 후 "내 주문 · 로그아웃" */
+async function renderAuthNav() {
+  const nav = document.getElementById("authNav");
+  if (!nav || typeof Auth === "undefined") return;
+  const user = await Auth.user();
+  if (!user) return;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  nav.innerHTML = `<span class="who">${esc(Auth.name(user))}님</span><a href="orders.html">내 주문</a><a href="#" id="logoutBtn">로그아웃</a>`;
+  document.getElementById("logoutBtn").addEventListener("click", async (e) => {
+    e.preventDefault();
+    await sb.auth.signOut();
+    try { sessionStorage.removeItem("aperture_pending_order"); } catch (err) {}
+    location.href = "index.html";
+  });
+}

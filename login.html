@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 | APERTURE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="login">
+  <div id="header"></div>
+
+  <main class="section">
+    <div class="container auth-wrap">
+      <h1 class="section-title" style="margin-bottom:32px">로그인</h1>
+      <form id="authForm" class="auth-form" novalidate>
+        <div class="field"><label for="email">이메일</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="password">비밀번호</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+        <p id="authMsg" class="auth-msg" role="alert"></p>
+        <button class="btn btn-yellow btn-block" type="submit">로그인</button>
+        <p class="auth-alt">아직 회원이 아니신가요? <a href="signup.html" data-keep-next>회원가입</a></p>
+      </form>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/reviews.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

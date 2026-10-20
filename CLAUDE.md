@@ -74,9 +74,14 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 - `.mcp.json`에 토스페이먼츠 연동 가이드 MCP 서버(`@tosspayments/integration-guide-mcp`)가 설정되어 있습니다. `npx`로 실행되므로 Node.js를 설치해야 동작합니다.
 - 이 PC에는 `claude` CLI가 없어 `claude plugin ...` 명령을 쓸 수 없습니다. 플러그인은 앱의 Customize → Plugins에서 설치합니다. `claude-md-management`는 설치되어 있습니다.
 
-## Supabase 연동 계획 (`PRD.md`)
+## Supabase 연동 (`PRD.md`)
 
-- 회원가입, 로그인, 내 주문 내역(`orders.html`), 환불/취소, 리뷰와 리뷰 좋아요를 Supabase로 구현할 계획입니다. 기능과 화면은 `PRD.md`를 기준으로 합니다. 아직 구현 전이며, Supabase 프로젝트도 만들어지지 않았습니다(Claude Desktop의 Supabase 커넥터는 연결되어 있습니다).
-- 결정 사항: 구매는 로그인 회원만, 상품 데이터는 DB로 이전, 로그인은 이메일+비밀번호입니다.
-- 결제 승인(`/v1/payments/confirm`)과 환불은 Supabase Edge Function에서 처리합니다. 토스 시크릿 키와 Supabase `service_role` 키는 프론트엔드에 넣지 않고, 프론트에는 `anon` 키만 `js/config.js`에 둡니다.
-- 번들러가 없으므로 `@supabase/supabase-js`는 CDN `<script>`로 불러옵니다.
+프로젝트 `aperture-shop`(ref `slgiczbxvmgvtookcplp`, ap-northeast-2)에 구현되어 있습니다. 스크립트 로드 순서는 supabase-js(CDN) → `config.js` → `products.js` → `db.js` → `common.js` → `reviews.js` → 페이지 스크립트입니다.
+
+- `js/db.js`: `sb`(클라이언트), `Auth`(user/require/call), `productsReady`(DB 상품으로 `PRODUCTS` 교체 + 평점 로드). 페이지 스크립트는 시작할 때 `await productsReady` 합니다. `products.js`는 DB 실패 시 쓰는 기본 데이터입니다.
+- 테이블: `products`, `orders`, `order_items`, `reviews`, `review_likes` (RLS 적용). 주문 쓰기는 프론트에서 불가, Edge Function(service_role)만 가능합니다. `has_purchased(pid)` RPC가 리뷰 작성 자격(결제완료 구매)을 판정합니다.
+- Edge Function(모두 `verify_jwt`): `create-order`(서버가 가격으로 금액 계산), `confirm-payment`(금액 검증 후 토스 승인, `fail: true`면 결제실패 기록), `cancel-order`(토스 취소). 소스는 저장소에 없고 Supabase에 배포되어 있습니다. 토스 시크릿 키는 함수 환경변수 `TOSS_SECRET_KEY`이며, 없으면 토스 공개 테스트 키를 씁니다.
+- 새 페이지: `login.html`, `signup.html`(`auth.js`), `orders.html`(`orders.js`). 구매는 로그인 필수(`Auth.require()`), 로그인 후 `?next=`로 복귀합니다.
+- 저장소 키 `aperture_pending_order`는 이제 `{orderId, isBuyNow, done}`만 담습니다.
+- 주의: Supabase 기본 설정은 이메일 인증이 켜져 있고 `example.com` 같은 도메인은 가입이 거부됩니다. PRD 기본안(인증 없음)대로 하려면 대시보드 Authentication → Providers → Email에서 "Confirm email"을 끄세요.
+- 프론트에는 `anon` 키만 `js/config.js`에 둡니다. `service_role` 키와 토스 시크릿 키는 넣지 않습니다.
