@@ -6,8 +6,23 @@
 const won = (n) => Number(n).toLocaleString("ko-KR");
 
 /* ---------- 장바구니 (localStorage) ---------- */
+/* 로그인한 회원 id (Supabase 세션이 localStorage 에 저장돼 있어 동기적으로 읽을 수 있다) */
+function currentUserId() {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (/^sb-.+-auth-token$/.test(k)) {
+        const s = JSON.parse(localStorage.getItem(k));
+        if (s && s.user && s.user.id) return s.user.id;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+/* 장바구니는 비회원/회원별로 따로 저장: aperture_cart(비회원), aperture_cart_{회원id} */
 const Cart = {
-  KEY: "aperture_cart",
+  get KEY() { const uid = currentUserId(); return uid ? `aperture_cart_${uid}` : "aperture_cart"; },
   read() {
     try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } catch (e) { return []; }
   },

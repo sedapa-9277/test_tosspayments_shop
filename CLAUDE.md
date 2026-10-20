@@ -43,7 +43,7 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 
 | 키 | 저장소 | 쓰는 곳 → 읽는 곳 |
 | --- | --- | --- |
-| `aperture_cart` | localStorage | `Cart` 객체 (`common.js`) |
+| `aperture_cart` / `aperture_cart_{회원id}` | localStorage | `Cart` 객체 (`common.js`). 비회원과 회원별로 분리 |
 | `aperture_buynow` | sessionStorage | 바로구매 → `checkout.html?mode=buynow` |
 | `aperture_pending_order` | sessionStorage | `checkout.js`가 `requestPayment` 직전에 저장 → `result.js`가 읽음 |
 
