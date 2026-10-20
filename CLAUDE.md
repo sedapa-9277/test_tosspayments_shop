@@ -81,6 +81,7 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 - `js/db.js`: `sb`(클라이언트), `Auth`(user/require/call), `productsReady`(DB 상품으로 `PRODUCTS` 교체 + 평점 로드). 페이지 스크립트는 시작할 때 `await productsReady` 합니다. `products.js`는 DB 실패 시 쓰는 기본 데이터입니다.
 - 테이블: `products`, `orders`, `order_items`, `reviews`, `review_likes` (RLS 적용). 주문 쓰기는 프론트에서 불가, Edge Function(service_role)만 가능합니다. `has_purchased(pid)` RPC가 리뷰 작성 자격(결제완료 구매)을 판정합니다.
 - Edge Function(모두 `verify_jwt`): `create-order`(서버가 가격으로 금액 계산), `confirm-payment`(금액 검증 후 토스 승인, `fail: true`면 결제실패 기록), `cancel-order`(토스 취소). 소스는 저장소에 없고 Supabase에 배포되어 있습니다. 토스 시크릿 키는 함수 환경변수 `TOSS_SECRET_KEY`이며, 없으면 토스 공개 테스트 키를 씁니다.
+- 상품 상세: `product.html?id=`(`product.js`). 설명/특징/스펙표는 `products.detail`(jsonb: summary, highlights, specs)에서 읽고, 카드 이미지·이름이 이 페이지로 링크됩니다.
 - 새 페이지: `login.html`, `signup.html`(`auth.js`), `orders.html`(`orders.js`). 구매는 로그인 필수(`Auth.require()`), 로그인 후 `?next=`로 복귀합니다.
 - 저장소 키 `aperture_pending_order`는 이제 `{orderId, isBuyNow, done}`만 담습니다.
 - 주의: Supabase 기본 설정은 이메일 인증이 켜져 있고 `example.com` 같은 도메인은 가입이 거부됩니다. PRD 기본안(인증 없음)대로 하려면 대시보드 Authentication → Providers → Email에서 "Confirm email"을 끄세요.

@@ -54,7 +54,7 @@ const productsReady = (async () => {
       PRODUCTS.length = 0;
       prod.data.forEach((p) => PRODUCTS.push({
         id: p.id, category: p.category, art: p.art, name: p.name, sub: p.sub,
-        price: p.price, badge: p.badge || undefined, tags: p.tags, specs: p.specs,
+        price: p.price, badge: p.badge || undefined, tags: p.tags, specs: p.specs, detail: p.detail,
       }));
     }
     if (!rev.error && rev.data) {

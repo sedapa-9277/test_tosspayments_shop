@@ -335,13 +335,13 @@ function ratingLine(id) {
 function productCard(p) {
   return `
   <article class="card" data-id="${p.id}">
-    <div class="card-media">
+    <a class="card-media" href="product.html?id=${p.id}" aria-label="${p.name} 상세 보기">
       ${p.badge ? `<span class="badge ${p.badge}">${p.badge}</span>` : ""}
       ${productArt(p.art)}
-    </div>
+    </a>
     <div class="card-body">
       <span class="card-sub">${p.sub}</span>
-      <h3 class="card-name">${p.name}</h3>
+      <h3 class="card-name"><a href="product.html?id=${p.id}">${p.name}</a></h3>
       ${ratingLine(p.id)}
       <ul class="card-specs">${p.specs.map((s) => `<li>${s}</li>`).join("")}</ul>
       <div class="card-foot">
