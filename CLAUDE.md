@@ -90,6 +90,6 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 ## 챗봇 (`js/chatbot.js`)
 
 - 모든 페이지 우측 하단에 뜨는 상담 위젯입니다(`reviews.js` 다음에 로드). 대화 기록은 sessionStorage `aperture_chat`에 저장합니다.
-- 답변은 Edge Function `chat`(소스: `supabase/functions/chat/index.ts`)이 OpenAI API로 만듭니다. 상품 목록은 DB에서 읽어 시스템 프롬프트에 넣고, 배송·환불·결제 안내문도 이 파일의 `POLICY`에 있습니다. 정책이 바뀌면 이 상수를 고치고 재배포하세요.
+- 답변은 Edge Function `chat`(소스: `supabase/functions/chat/index.ts`)이 OpenAI API로 만듭니다. 지식(상품 상세 + 이용 안내 `POLICY_ITEMS`)은 Upstage 임베딩으로 `knowledge` 테이블(pgvector)에 저장하고, 질문과 가까운 8개만 프롬프트에 넣습니다(RAG). 요청 때 내용 해시가 바뀐 항목만 자동으로 다시 임베딩하므로 상품 DB나 정책을 고치면 따로 인덱싱할 필요가 없습니다. `UPSTAGE_API_KEY`가 없거나 임베딩이 실패하면 전체 목록을 넣는 방식으로 대체됩니다(응답의 `mode`: `rag`/`full`).
 - 필요한 시크릿: `OPENAI_API_KEY`(Supabase Edge Functions → Secrets). 없으면 함수가 503을 돌려주고 위젯은 연결 오류 문구를 보여 줍니다. 모델은 `CHAT_MODEL`(기본 `gpt-4o-mini`).
 - 사용량 제한(레이트 리밋)은 아직 없습니다. 공개 배포 전에 추가하세요.
