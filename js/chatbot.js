@@ -13,6 +13,8 @@
 
   /* 마크다운 링크 [텍스트](product.html?id=...) 만 링크로 바꾸고 나머지는 이스케이프 */
   function format(text) {
+    // 모델이 (product.html?id=...) 대신 상품 id만 쓴 경우도 링크로 처리
+    text = text.replace(/\]\(((?:cam|lens|acc)-[\w-]+)\)/g, "](product.html?id=$1)");
     return e(text).replace(/\[([^\]]+)\]\(((?:product|orders|cart|cameras|lenses|accessories)\.html(?:\?id=[\w-]+)?)\)/g,
       '<a href="$2">$1</a>').replace(/\n/g, "<br>");
   }
