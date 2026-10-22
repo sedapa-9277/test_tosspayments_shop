@@ -86,3 +86,10 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 - 저장소 키 `aperture_pending_order`는 이제 `{orderId, isBuyNow, done}`만 담습니다.
 - 주의: Supabase 기본 설정은 이메일 인증이 켜져 있고 `example.com` 같은 도메인은 가입이 거부됩니다. PRD 기본안(인증 없음)대로 하려면 대시보드 Authentication → Providers → Email에서 "Confirm email"을 끄세요.
 - 프론트에는 `anon` 키만 `js/config.js`에 둡니다. `service_role` 키와 토스 시크릿 키는 넣지 않습니다.
+
+## 챗봇 (`js/chatbot.js`)
+
+- 모든 페이지 우측 하단에 뜨는 상담 위젯입니다(`reviews.js` 다음에 로드). 대화 기록은 sessionStorage `aperture_chat`에 저장합니다.
+- 답변은 Edge Function `chat`(소스: `supabase/functions/chat/index.ts`)이 Claude API로 만듭니다. 상품 목록은 DB에서 읽어 시스템 프롬프트에 넣고, 배송·환불·결제 안내문도 이 파일의 `POLICY`에 있습니다. 정책이 바뀌면 이 상수를 고치고 재배포하세요.
+- 필요한 시크릿: `ANTHROPIC_API_KEY`(Supabase Edge Functions → Secrets). 없으면 함수가 503을 돌려주고 위젯은 연결 오류 문구를 보여 줍니다. 모델은 `CHAT_MODEL`(기본 `claude-haiku-5-5`).
+- 사용량 제한(레이트 리밋)은 아직 없습니다. 공개 배포 전에 추가하세요.
