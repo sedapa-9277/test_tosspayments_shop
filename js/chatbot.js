@@ -1,6 +1,6 @@
 /* =========================================================
    쇼핑 상담 챗봇 위젯 (모든 페이지 우측 하단)
-   답변은 Edge Function `chat` (Claude API)에서 받아 옵니다.
+   답변은 Edge Function `chat` (OpenAI API)에서 받아 옵니다.
    ========================================================= */
 (function () {
   if (typeof Auth === "undefined") return;

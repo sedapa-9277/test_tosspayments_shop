@@ -90,6 +90,6 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 ## 챗봇 (`js/chatbot.js`)
 
 - 모든 페이지 우측 하단에 뜨는 상담 위젯입니다(`reviews.js` 다음에 로드). 대화 기록은 sessionStorage `aperture_chat`에 저장합니다.
-- 답변은 Edge Function `chat`(소스: `supabase/functions/chat/index.ts`)이 Claude API로 만듭니다. 상품 목록은 DB에서 읽어 시스템 프롬프트에 넣고, 배송·환불·결제 안내문도 이 파일의 `POLICY`에 있습니다. 정책이 바뀌면 이 상수를 고치고 재배포하세요.
-- 필요한 시크릿: `ANTHROPIC_API_KEY`(Supabase Edge Functions → Secrets). 없으면 함수가 503을 돌려주고 위젯은 연결 오류 문구를 보여 줍니다. 모델은 `CHAT_MODEL`(기본 `claude-haiku-5-5`).
+- 답변은 Edge Function `chat`(소스: `supabase/functions/chat/index.ts`)이 OpenAI API로 만듭니다. 상품 목록은 DB에서 읽어 시스템 프롬프트에 넣고, 배송·환불·결제 안내문도 이 파일의 `POLICY`에 있습니다. 정책이 바뀌면 이 상수를 고치고 재배포하세요.
+- 필요한 시크릿: `OPENAI_API_KEY`(Supabase Edge Functions → Secrets). 없으면 함수가 503을 돌려주고 위젯은 연결 오류 문구를 보여 줍니다. 모델은 `CHAT_MODEL`(기본 `gpt-4o-mini`).
 - 사용량 제한(레이트 리밋)은 아직 없습니다. 공개 배포 전에 추가하세요.

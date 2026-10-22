@@ -1,6 +1,6 @@
 // 쇼핑몰 상담 챗봇 Edge Function
-// 필요한 환경변수(Supabase → Edge Functions → Secrets): ANTHROPIC_API_KEY
-// 선택: CHAT_MODEL (기본 claude-haiku-5-5)
+// 필요한 환경변수(Supabase → Edge Functions → Secrets): OPENAI_API_KEY
+// 선택: CHAT_MODEL (기본 gpt-4o-mini)
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -10,7 +10,7 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
-const MODEL = Deno.env.get("CHAT_MODEL") ?? "claude-haiku-5-5";
+const MODEL = Deno.env.get("CHAT_MODEL") ?? "gpt-4o-mini";
 const MAX_TURNS = 12;
 const MAX_CHARS = 500;
 
@@ -28,7 +28,7 @@ const POLICY = `
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
-    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return json({ error: "챗봇이 아직 준비되지 않았습니다." }, 503);
 
     const body = await req.json();
@@ -59,17 +59,17 @@ ${POLICY}
 [상품 목록]
 ${catalog}`;
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({ model: MODEL, max_tokens: 700, system, messages }),
+      headers: { Authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+      body: JSON.stringify({ model: MODEL, max_tokens: 700, messages: [{ role: "system", content: system }, ...messages] }),
     });
     const out = await res.json();
     if (!res.ok) {
-      console.error("anthropic error", res.status, JSON.stringify(out));
+      console.error("openai error", res.status, JSON.stringify(out));
       return json({ error: "지금은 답변할 수 없습니다. 잠시 후 다시 시도해 주세요." }, 502);
     }
-    const reply = (out.content ?? []).filter((b: any) => b.type === "text").map((b: any) => b.text).join("\n").trim();
+    const reply = String(out.choices?.[0]?.message?.content ?? "").trim();
     return json({ reply: reply || "답변을 만들지 못했습니다. 다시 질문해 주세요." });
   } catch (e) {
     return json({ error: String((e as Error)?.message ?? e) }, 500);
